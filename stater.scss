@@ -15,15 +15,17 @@
   // Define final-selector
   $final-sel: "";
 
+  // Loop over each parent-selector
   @for $i1 from 1 through length($parent-sels) {
     $parent-sel: nth($parent-sels, $i1);
 
+    // Loop over each state
     @for $i2 from 1 through length($states) {
-      // Check if state is a pseudo class or not and add ":" or "." accordingly
       $state: nth($states, $i2);
+      // Check if state is a pseudo class or not and add ":" or "." accordingly
       $state: if(_is-pseudo-class($state), ":" + $state, "." + $state);
 
-      // Loop over each selector in & and create state selector
+      // Loop over each selector
       @for $i3 from 1 through length(&) {
         $state-sel: "";
         $sel: _to-str(nth(&, $i3));
