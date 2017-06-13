@@ -1,0 +1,80 @@
+// --------------------------------
+// Stater - the state setting mixin
+// --------------------------------
+// @param $state [String or List]
+//   Name(s) of pseudo-class(es) or state class(es) without leading ":" or "."
+//   which should be applied to the current selector or $parent-sels
+//
+// @param $parent-sels [String or List] optional
+//   Name(s) of the parent-selector(s) to which the $state should be applied.
+// --------------------------------
+
+@import "_helpers";
+
+@mixin stater($states, $parent-sels: undefined) {
+  // Define final-selector
+  $final-sel: "";
+
+  @for $i1 from 1 through length($parent-sels) {
+    $parent-sel: nth($parent-sels, $i1);
+
+    @for $i2 from 1 through length($states) {
+      // Check if state is a pseudo class or not and add ":" or "." accordingly
+      $state: nth($states, $i2);
+      $state: if(_is-pseudo-class($state), ":" + $state, "." + $state);
+
+      // Loop over each selector in & and create state selector
+      @for $i3 from 1 through length(&) {
+        $state-sel: "";
+        $sel: _to-str(nth(&, $i3));
+
+        // If there are no parent-selectors specified,
+        // state should be applied to selector directly
+        @if $parent-sel == undefined {
+          $state-sel: $sel + $state;
+        }
+
+        // If parent-selector is in selector as stand alone or as part of
+        // pseudo element, parent-selector should be replaced with
+        // parent-selector plus state
+        @else if (
+          str-index($sel, $parent-sel + " ") or
+          str-index($sel, $parent-sel + "::")
+        ) {
+          $state-sel: selector-replace($sel, $parent-sel, $parent-sel + $state);
+        }
+
+        // If parent-selector is not in selector,
+        // parent-selector plus state should be prepended to selector
+        @else {
+          $state-sel: $parent-sel + $state + " " + $sel; }
+
+        // Add state selector to the end of final-selector
+        $final-sel: $final-sel + $state-sel;
+
+        // If selector is not the last selector in &,
+        // add a comma to the end of final-selector
+        @if $i3 < length(&) {
+          $final-sel: $final-sel + ", ";
+        }
+      }
+
+      // If state is not the last state in states,
+      // add a comma to the end of final-selector
+      @if $i2 < length($states) {
+        $final-sel: $final-sel + ", ";
+      }
+    }
+
+    // If parent-selector is not the last parent-selector in parent-selectors,
+    // add a comma to the end of final-selector
+    @if $i1 < length($parent-sels) {
+      $final-sel: $final-sel + ", ";
+    }
+  }
+
+  // Output final-selector with content at root
+  @at-root #{$final-sel} {
+    @content;
+  }
+}
