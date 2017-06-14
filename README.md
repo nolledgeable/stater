@@ -1,4 +1,4 @@
-# stater
+# Stater
 The state setting Sass mixin
 
 #### Required Sass version: 3.4+
