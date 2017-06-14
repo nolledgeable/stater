@@ -1,8 +1,6 @@
 # Stater
 The state setting Sass mixin
 
-#### Required Sass version: 3.4+
-
 ### Usage
 ###### Input
 ```scss
@@ -72,3 +70,5 @@ body.modal-is-active .parent-sel {
   color: MistyRose;
 }
 ```
+
+#### Required Sass version: 3.4+
