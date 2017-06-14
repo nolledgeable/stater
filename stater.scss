@@ -8,9 +8,6 @@
 // @param $parent-sels [String or List] optional
 //   Name(s) of the parent-selector(s) to which the $state should be applied.
 // --------------------------------
-
-@import "_helpers";
-
 @mixin stater($states, $parent-sels: undefined) {
   // Define final-selector
   $final-sel: "";
@@ -33,23 +30,29 @@
         // If there are no parent-selectors specified,
         // state should be applied to selector directly
         @if $parent-sel == undefined {
-          $state-sel: $sel + $state;
+
+          // If selector contains a pseudo-element,
+          // state should be inserted before pseudo-element
+          @if str-index($sel, "::") {
+            $state-sel: str-insert($sel, $state, str-index($sel, "::"));
+          }
+          @else {
+            $state-sel: $sel + $state;
+          }
         }
 
-        // If parent-selector is in selector as stand alone or as part of
-        // pseudo element, parent-selector should be replaced with
-        // parent-selector plus state
-        @else if (
-          str-index($sel, $parent-sel + " ") or
-          str-index($sel, $parent-sel + "::")
-        ) {
-          $state-sel: selector-replace($sel, $parent-sel, $parent-sel + $state);
+        // If parent-selector is in selector as stand alone,
+        // state should be inserted after parent-selector
+        @else if str-index($sel, $parent-sel + " ") or str-index($sel, $parent-sel + ".") {
+          $state-sel: str-insert($sel, $state, str-index($sel, $parent-sel) + str-length($parent-sel));
         }
 
         // If parent-selector is not in selector,
         // parent-selector plus state should be prepended to selector
         @else {
-          $state-sel: $parent-sel + $state + " " + $sel; }
+          $state-sel: $parent-sel + $state + " " + $sel;
+
+        }
 
         // Add state selector to the end of final-selector
         $final-sel: $final-sel + $state-sel;
